@@ -1,0 +1,30 @@
+[{  "_id": 1,
+    "matric_no": "08040001",
+    "surname": "Olushola",
+    "firstName": "Jide",
+    "lastName": "Victor",
+    "phone": "0802292992",
+    "email": "eieoeo@gmail.com",
+    "course": "Computer Science",
+    "department": "Engineering",
+    "falcuty": "Science",
+    "garden": ["Jame Olushola", "080382922", "23 kebi street"]
+
+
+},
+{   "_id": 2,
+    "matric_no": "08040002",
+    "surname": "Adeniyi",
+    "firstName": "Jenet",
+    "lastName": "Blessing",
+    "phone": "080229083",
+    "email": "jenet@gmail.com",
+    "course": "Economics",
+    "department": "Socience Sciences",
+    "falcuty": "Economics",
+    "garden": ["Adeniyi James", "0803820090", "13 Ikeja street"]
+
+
+}
+
+]

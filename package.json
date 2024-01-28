@@ -1,0 +1,16 @@
+{
+  "name": "expressjs_student_record",
+  "version": "1.0.0",
+  "description": "Student Record demo Project",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "author": "Uexcel",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.1"
+  }
+}
