@@ -2,8 +2,19 @@ const Students = require("./../models/studentModel");
 const asyncErrorHandler = require("./../utils/asyncErrorHandler");
 const CustomError = require("./../utils/customError");
 
-exports.addStudent = asyncErrorHandler(async (req, resp) => {
+exports.addStudent = asyncErrorHandler(async (req, resp, next) => {
+  const stud = await Students.findOne({ email: req.body.email });
+  console.log(stud);
+  if (stud) {
+    const error = new CustomError(
+      `This email address : ${req.body.email} has been used by someone else. Please Consult the school`,
+      400
+    );
+    return next(error);
+  }
+
   const student = await Students.create(req.body);
+
   resp.status(201).json({
     status: "success",
     data: {

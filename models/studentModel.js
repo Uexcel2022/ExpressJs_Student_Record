@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const CustomError = require("./../utils/customError");
 const studentSchema = new mongoose.Schema({
   matricNumber: {
     type: String,
@@ -41,7 +42,6 @@ const studentSchema = new mongoose.Schema({
 
   email: {
     type: String,
-    required: [true, "email is a required field"],
     unique: [true, "The email is being uesd by aother student."],
   },
   phone: {
