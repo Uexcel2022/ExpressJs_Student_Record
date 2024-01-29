@@ -18,13 +18,36 @@ const studentSchema = new mongoose.Schema({
     required: [true, "last name is a required field"],
   },
 
+  DOB: {
+    type: Date,
+    validate: {
+      validator: function (value) {
+        const yearOfBirth = new Date(value).getFullYear();
+        const monthOfBirth = new Date(value).getMonth();
+        const monthDayOfBirth = new Date(value).getDate();
+
+        let age = new Date().getFullYear() - yearOfBirth;
+
+        if (new Date().getMonth() < monthOfBirth) {
+          age = age - 1;
+        } else if (new Date().getDate() < monthDayOfBirth) {
+          age = age - 1;
+        }
+        return age >= 18;
+      },
+      message: "You must be 18 years of age or above to be eligible",
+    },
+  },
+
   email: {
     type: String,
     required: [true, "email is a required field"],
+    unique: [true, "The email is being uesd by aother student."],
   },
   phone: {
     type: String,
     required: [true, "Phone number is a required field"],
+    unique: [true, "The phone number is being uesd by aother student."],
   },
 
   addmissionYear: {
@@ -32,7 +55,6 @@ const studentSchema = new mongoose.Schema({
     required: [true, "Phone number is a required field"],
     validate: {
       validator: function (value) {
-        console.log(new Date().getFullYear() * 1);
         return value <= new Date().getFullYear() * 1;
       },
       message: "Invalid admission year",
@@ -56,6 +78,28 @@ const studentSchema = new mongoose.Schema({
   gardian: {
     type: [String],
     required: [true, "Guidian information is requred"],
+  },
+
+  year1: {
+    type: [Object],
+    sem1: [Object],
+    sem2: [Object],
+  },
+  year2: {
+    type: [Object],
+    sem1: [Object],
+    sem2: [Object],
+  },
+
+  year3: {
+    type: [Object],
+    sem1: [Object],
+    sem2: [Object],
+  },
+  year4: {
+    type: [Object],
+    sem1: [Object],
+    sem2: [Object],
   },
 });
 

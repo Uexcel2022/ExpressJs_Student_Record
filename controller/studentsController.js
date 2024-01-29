@@ -1,7 +1,8 @@
-const fs = require("fs");
 const Students = require("./../models/studentModel");
+const asyncErrorHandler = require("./../utils/asyncErrorHandler");
+const CustomError = require("./../utils/customError");
 
-exports.addStudent = async (req, resp) => {
+exports.addStudent = asyncErrorHandler(async (req, resp) => {
   const student = await Students.create(req.body);
   resp.status(201).json({
     status: "success",
@@ -9,9 +10,9 @@ exports.addStudent = async (req, resp) => {
       student,
     },
   });
-};
+});
 
-exports.findAllStudents = async (req, resp) => {
+exports.findAllStudents = asyncErrorHandler(async (req, resp, next) => {
   const students = await Students.find();
   resp.status(200).json({
     status: "success",
@@ -20,16 +21,15 @@ exports.findAllStudents = async (req, resp) => {
       students: students,
     },
   });
-};
+});
 
-exports.findStudentById = async (req, resp) => {
+exports.findStudentById = asyncErrorHandler(async (req, resp, next) => {
   const id = req.params.id;
   const student = await Students.findById(id);
   if (!student) {
-    return resp.status(404).json({
-      status: "fail",
-      message: `Can't find student with ID: ${id}`,
-    });
+    const msg = `Can't find student with ID: ${id}`;
+    const customError = new CustomError(msg, 404);
+    return next(customError);
   }
   resp.status(200).json({
     status: "success",
@@ -37,9 +37,9 @@ exports.findStudentById = async (req, resp) => {
       student,
     },
   });
-};
+});
 
-exports.updateStudent = async (req, resp) => {
+exports.updateStudent = asyncErrorHandler(async (req, resp) => {
   const id = req.params.id;
   let student = await Students.findByIdAndUpdate(id, req.body, {
     new: true,
@@ -57,7 +57,7 @@ exports.updateStudent = async (req, resp) => {
       student,
     },
   });
-};
+});
 
 exports.deleteStudent = async (req, resp) => {
   const id = req.params.id;
