@@ -10,6 +10,7 @@ exports.addStudent = asyncErrorHandler(async (req, resp, next) => {
       `This email address : ${req.body.email} has been used by someone else. Please Consult the school`,
       400
     );
+    1;
     return next(error);
   }
 
