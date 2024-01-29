@@ -1,35 +1,21 @@
 const fs = require("fs");
-let students = JSON.parse(fs.readFileSync("./data/students.json", "utf-8"));
+const Students = require("./../models/studentModel");
 
 exports.addStudent = async (req, resp) => {
-  const id = { _id: students[students.length - 1]._id + 1 };
-  const newStudent = Object.assign(id, req.body);
-
-  students.push(newStudent);
-  fs.writeFileSync(
-    "./data/students.json",
-    JSON.stringify(students),
-    (error) => {
-      if (error) {
-        return resp.status(500).json({
-          status: "fail",
-          message: "Error occurred, could not save student",
-        });
-      }
-    }
-  );
-
+  const student = await Students.create(req.body);
   resp.status(201).json({
     status: "success",
     data: {
-      student: newStudent,
+      student,
     },
   });
 };
 
 exports.findAllStudents = async (req, resp) => {
+  const students = await Students.find();
   resp.status(200).json({
     status: "success",
+    count: students.length,
     data: {
       students: students,
     },
@@ -37,49 +23,34 @@ exports.findAllStudents = async (req, resp) => {
 };
 
 exports.findStudentById = async (req, resp) => {
-  const id = req.params.id * 1;
-  const student = await students.find((el) => el._id == id);
+  const id = req.params.id;
+  const student = await Students.findById(id);
   if (!student) {
     return resp.status(404).json({
       status: "fail",
       message: `Can't find student with ID: ${id}`,
     });
   }
-  fs.readFileSync("./");
-
   resp.status(200).json({
     status: "success",
     data: {
-      student: student,
+      student,
     },
   });
 };
 
 exports.updateStudent = async (req, resp) => {
-  const id = req.params.id * 1;
-  let student = await students.find((el) => el._id == id);
+  const id = req.params.id;
+  let student = await Students.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
   if (!student) {
     return resp.status(404).json({
       status: "fail",
       message: `Can't find student with ID: ${id}`,
     });
   }
-  Object.assign(student, req.body);
-  const index = students.indexOf(student);
-  students[index] = student;
-
-  fs.writeFileSync(
-    "./data/students.json",
-    JSON.stringify(students),
-    (error) => {
-      if (error) {
-        return resp.status(500).json({
-          status: "fail",
-          message: "Error occurred, could not save student",
-        });
-      }
-    }
-  );
   resp.status(200).json({
     status: "success",
     data: {
@@ -89,8 +60,8 @@ exports.updateStudent = async (req, resp) => {
 };
 
 exports.deleteStudent = async (req, resp) => {
-  const id = req.params.id * 1;
-  let student = await students.find((el) => el._id == id);
+  const id = req.params.id;
+  let student = await Students.findByIdAndDelete(id);
   if (!student) {
     return resp.status(404).json({
       status: "fail",
@@ -98,21 +69,6 @@ exports.deleteStudent = async (req, resp) => {
     });
   }
 
-  const index = students.indexOf(student);
-  students.splice(index, 1);
-
-  fs.writeFileSync(
-    "./data/students.json",
-    JSON.stringify(students),
-    (error) => {
-      if (error) {
-        return resp.status(500).json({
-          status: "fail",
-          message: "Error occurred, could not save student",
-        });
-      }
-    }
-  );
   resp.status(204).json({
     status: "success",
     data: null,
