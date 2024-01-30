@@ -1,16 +1,15 @@
 const Students = require("./../models/studentModel");
 const asyncErrorHandler = require("./../utils/asyncErrorHandler");
 const CustomError = require("./../utils/customError");
+const ApiFeatures = require("./../utils/apiFeatures");
 
 exports.addStudent = asyncErrorHandler(async (req, resp, next) => {
   const stud = await Students.findOne({ email: req.body.email });
-  console.log(stud);
   if (stud) {
     const error = new CustomError(
       `This email address : ${req.body.email} has been used by someone else. Please Consult the school`,
       400
     );
-    1;
     return next(error);
   }
 
@@ -25,12 +24,18 @@ exports.addStudent = asyncErrorHandler(async (req, resp, next) => {
 });
 
 exports.findAllStudents = asyncErrorHandler(async (req, resp, next) => {
-  const students = await Students.find();
+  const count = await Students.countDocuments();
+  const apiFeatures = new ApiFeatures(Students.find(), req.query, count)
+    .sortUrl()
+    .sortQueryResult()
+    .selectedFields();
+
+  const students = await apiFeatures.query;
   resp.status(200).json({
     status: "success",
     count: students.length,
     data: {
-      students: students,
+      students,
     },
   });
 });
@@ -51,17 +56,26 @@ exports.findStudentById = asyncErrorHandler(async (req, resp, next) => {
   });
 });
 
-exports.updateStudent = asyncErrorHandler(async (req, resp) => {
+exports.updateStudent = asyncErrorHandler(async (req, resp, next) => {
+  if (req.body.email) {
+    const stud = await Students.findOne({ email: req.body.email });
+    if (stud) {
+      const error = new CustomError(
+        `This email address : ${req.body.email} has been used by someone else. Please Consult the school`,
+        400
+      );
+      return next(error);
+    }
+  }
   const id = req.params.id;
-  let student = await Students.findByIdAndUpdate(id, req.body, {
+  const student = await Students.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
   });
   if (!student) {
-    return resp.status(404).json({
-      status: "fail",
-      message: `Can't find student with ID: ${id}`,
-    });
+    const msg = `Can't find student with ID: ${id}`;
+    const err = new CustomError(msg, 404);
+    return next(err);
   }
   resp.status(200).json({
     status: "success",
@@ -71,18 +85,18 @@ exports.updateStudent = asyncErrorHandler(async (req, resp) => {
   });
 });
 
-exports.deleteStudent = async (req, resp) => {
+exports.deleteStudent = asyncErrorHandler(async (req, resp, next) => {
   const id = req.params.id;
   let student = await Students.findByIdAndDelete(id);
+
   if (!student) {
-    return resp.status(404).json({
-      status: "fail",
-      message: `Can't find student with ID: ${id}`,
-    });
+    const msg = `Can't find student with ID: ${id}`;
+    const err = new CustomError(msg, 404);
+    return next(err);
   }
 
   resp.status(204).json({
     status: "success",
     data: null,
   });
-};
+});
